@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="3D-simulatie van Construct B.V. vóór en na QRM, met live job map en MCT. Gemaakt door Jefferson Synapps.">
 <title>Construct B.V. 3D Fabriek</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600&family=Carlito:wght@400;700&display=swap">
 <style>
   :root {
@@ -170,6 +171,51 @@
   .sc-kpis dt { font-size: 12px; color: #3A3A3A; }
   .sc-kpis dd { margin: 0; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
+  /* vlucht */
+  #btnFlight { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px 0 8px; margin-left: 8px; border-radius: 13px; border: 1.5px solid #7F6000; background: var(--note); color: #262626; font-size: 13px; font-weight: 700; }
+  #btnFlight:hover { background: var(--gold); }
+  #btnFlight[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #FFFFFF; }
+  #app[data-tour="on"] .tools, #app[data-tour="on"] .bottom, #app[data-tour="on"] .nav, #app[data-tour="on"] #btnMenu { display: none !important; }
+  .lbl.cur { outline: 3px solid var(--gold); outline-offset: 2px; transform-origin: center bottom; }
+  .tour-banner { position: absolute; left: 50%; top: 128px; z-index: 4; transform: translateX(-50%); pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: rgba(255,255,255,.95); border: 1px solid var(--line); border-bottom: 5px solid var(--gold); box-shadow: 0 6px 24px rgba(30,45,70,.18); padding: 10px 22px 8px; max-width: calc(100% - 32px); box-sizing: border-box; text-align: center; }
+  .tour-banner b { font-family: var(--f-title); font-weight: 600; font-size: 34px; line-height: 1.1; white-space: pre; }
+  .tour-banner span { font-size: 14px; color: var(--muted); }
+  .tour-banner.show { animation: tourIn 2.8s ease both; }
+  @keyframes tourIn { 0% { opacity: 0; transform: translate(-50%, 12px); } 12% { opacity: 1; transform: translate(-50%, 0); } 82% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -6px); } }
+  .tour { position: absolute; z-index: 3; left: 50%; transform: translateX(-50%); bottom: max(14px, env(safe-area-inset-bottom, 0px)); width: min(760px, calc(100% - 28px)); box-sizing: border-box; padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .tour-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .tour-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--ink); color: #FFFFFF; font-weight: 700; font-size: 13px; padding: 3px 9px; }
+  .tour-prog { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .tour-btns { margin-left: auto; display: inline-flex; gap: 6px; }
+  .tour-btns button { height: 30px; font-size: 13px; }
+  #tourSpeed[aria-pressed="true"] { background: var(--green); color: #FFFFFF; border-color: var(--green); }
+  #tourStop { background: var(--ink); color: #FFFFFF; border-color: var(--ink); }
+  .tour-route { list-style: none; margin: 0; padding: 2px 0; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .tour-route::-webkit-scrollbar { display: none; }
+  .tour-route li { flex: none; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 9px; border: 1px solid var(--line); background: #FFFFFF; color: var(--ink); position: relative; transition: background .25s, color .25s; }
+  .tour-route li + li::before { content: ""; position: absolute; left: -5px; top: 50%; width: 6px; height: 1px; background: #A9B0BA; }
+  .tour-route li i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .tour-route li[data-state="skip"] { opacity: .38; }
+  .tour-route li[data-state="done"] { color: var(--muted); background: #F2F4F7; }
+  .tour-route li[data-state="cur"] { background: var(--gold); border-color: #7F6000; font-weight: 700; }
+  .tour-now { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .tour-st { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0; }
+  .tour-st b { font-family: var(--f-title); font-weight: 600; font-size: 24px; line-height: 1.1; }
+  .tour-st span { color: var(--muted); font-size: 14px; }
+  .tour-day { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 14px; white-space: nowrap; background: var(--blue); color: #FFFFFF; padding: 1px 8px; }
+  .tour-facts { margin: 0; font-size: 14px; border-left: 5px solid var(--gold); padding-left: 9px; }
+  .tour-bar { height: 4px; background: #E3E6EA; overflow: hidden; }
+  .tour-bar i { display: block; height: 100%; background: var(--gold); transform-origin: left center; transform: scaleX(0); transition: transform .15s linear; }
+  #app[data-mobile="true"] #btnFlight { height: 24px; font-size: 12px; margin-left: 4px; padding: 0 8px 0 6px; }
+  #app[data-mobile="true"] .tour { width: calc(100% - 16px); padding: 8px; gap: 6px; bottom: max(8px, env(safe-area-inset-bottom, 0px)); }
+  #app[data-mobile="true"] .tour-st b { font-size: 19px; }
+  #app[data-mobile="true"] .tour-facts { font-size: 13px; }
+  #app[data-mobile="true"] .tour-prog { display: none; }
+  #app[data-mobile="true"] .tour-banner { top: 96px; padding: 8px 14px 6px; }
+  #app[data-mobile="true"] .tour-banner b { font-size: 22px; white-space: normal; }
+  @media (prefers-reduced-motion: reduce) { .tour-banner.show { animation: none; } .tour-bar i { transition: none; } }
+
   @media (max-width: 760px) {
     .brand h1 { font-size: 21px; }
     .brand .logo { width: 62px; height: 50px; }
@@ -187,6 +233,7 @@
 <style>html, body { margin: 0; } img { max-width: 100%; }</style>
 </head>
 <body>
+
 <div id="app">
   <div id="stage"></div>
   <div id="labels"></div>
@@ -201,6 +248,10 @@
           <span class="lb vo" id="lbVoor">Vóór QRM</span>
           <button id="qrmSwitch" type="button" role="switch" aria-checked="false" aria-label="Situatie na QRM tonen"></button>
           <span class="lb na" id="lbNa">Na QRM</span>
+          <button id="btnFlight" type="button" aria-pressed="false" title="Vlieg mee met de geselecteerde order door de fabriek">
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M21.5 3.5 2.5 11l7 2.6L12 21l3.1-6.5 6.4-11zM9.5 13.6l5.6-4.2" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" fill="none"/></svg>
+            <span>Vlucht</span>
+          </button>
         </div>
         <p class="qnote" id="qrmNote" hidden>De situatie na QRM (QROC, 6 dagen) wordt de volgende stap.</p>
       </div>
@@ -294,6 +345,26 @@
       <div><dt>Afgeleverd</dt><dd id="kOut">0</dd></div>
     </dl>
   </div>
+
+  <div class="tour-banner" id="tourBanner" hidden aria-live="polite"><b id="tbMain"></b><span id="tbSub"></span></div>
+  <section class="card tour" id="tour" hidden aria-label="Vlucht met de order">
+    <div class="tour-head">
+      <span class="tour-tag"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M21.5 3.5 2.5 11l7 2.6L12 21l3.1-6.5 6.4-11z" fill="currentColor"/></svg> Vlucht · <span id="tourOrder"></span></span>
+      <span class="tour-prog" id="tourProg"></span>
+      <span class="tour-btns">
+        <button id="tourSpeed" type="button" aria-pressed="false" title="Twee keer zo snel">2×</button>
+        <button id="tourPause" type="button">Pauze</button>
+        <button id="tourStop" type="button">Stoppen</button>
+      </span>
+    </div>
+    <ol class="tour-route" id="tourRoute" aria-label="Afdelingen op de route"></ol>
+    <div class="tour-now">
+      <div class="tour-st"><b id="tourStation"></b><span id="tourDept"></span></div>
+      <span class="tour-day" id="tourDay"></span>
+    </div>
+    <p class="tour-facts" id="tourFacts"></p>
+    <div class="tour-bar"><i id="tourBarFill"></i></div>
+  </section>
 
   <section id="schema" hidden aria-label="Schematische live job map">
     <div class="sc-wrap">
@@ -1885,6 +1956,7 @@
     });
   }
   function userMovedCam() {
+    if (tour) endTour('user');
     camGoal = null;
     ['camOverview', 'camOffice', 'camProd'].forEach(function (id) { $(id).setAttribute('aria-pressed', 'false'); });
   }
@@ -1939,6 +2011,7 @@
     el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
     el.addEventListener('wheel', function (e) {
       e.preventDefault();
+      if (tour) endTour('user');
       cam.r = Math.min(240, Math.max(10, cam.r * Math.exp(e.deltaY * 0.0012)));
       if (camGoal && camGoal.r) camGoal.r = null;
     }, { passive: false });
@@ -2439,7 +2512,7 @@
   }
   var tmpV = new T.Vector3();
   function updateMarker(t) {
-    var p = followedPos(tmpV), ring = marker.userData.ring;
+    var p = tour ? null : followedPos(tmpV), ring = marker.userData.ring;
     marker.visible = !!p; ring.visible = !!p;
     if (!p) return;
     var it = items.get(followed.id + 'm'), h = (STAGE_H[it.stage] || 0.3) + (it.cart.visible ? 0.3 : 0);
@@ -2453,7 +2526,7 @@
   var ray = new T.Raycaster(), ndc = new T.Vector2();
   var lastBoardTap = 0;
   function pick(cx, cy, ptype) {
-    if (fly || trans) return;
+    if (fly || trans || tour) return;
     var r = renderer.domElement.getBoundingClientRect();
     ndc.set((cx - r.left) / r.width * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
@@ -2489,7 +2562,7 @@
     L.el.querySelector('.nm').textContent = st.label;
     if (TIMES[id]) L.el.querySelector('.tm').textContent = TIMES[id];
     L.ct = L.el.querySelector('.ct'); L.situ = 'voor';
-    stationLabels[id] = L;
+    L.sid = id; stationLabels[id] = L;
   });
   var TIMES_NA = { intake: '15 min.', buigen: '1 uur', cnc: '1 uur', voorbew: '1 uur', lassen: '5 uur', coaten: '1 uur', montage: '1 uur', expeditie: '30 min.' };
   var stationLabelsNa = {};
@@ -2500,7 +2573,7 @@
     L.el.querySelector('.nm').textContent = st.label;
     if (TIMES_NA[id]) L.el.querySelector('.tm').textContent = TIMES_NA[id];
     L.ct = L.el.querySelector('.ct'); L.situ = 'na';
-    stationLabelsNa[id] = L;
+    L.sid = id; stationLabelsNa[id] = L;
   });
   W.titles.forEach(function (t) { var L = addLabel('', t.pos, t.small ? 'title small' : 'title', 'title'); L.el.textContent = t.text; L.situ = t.situ || 'voor'; });
   W.dayBars.forEach(function (d) { var L = addLabel('', d.pos, 'day', 'day'); L.el.textContent = d.text; L.situ = d.situ || 'voor'; });
@@ -2516,6 +2589,13 @@
     labels.forEach(function (L) {
       var show = L.kind === 'follow' ? !!followed && marker.visible && !trans && !fly : labelsOn && !trans && !fly && (!L.situ || L.situ === situ);
       if (L.kind === 'day' && !near && cam.r > 130) show = false;
+      if (tour) {
+        // tijdens de vlucht alleen het station waar je bent en het volgende, plus de afdelingsnamen
+        if (L.kind === 'tag') show = L.situ === situ && (L.sid === tour.curId || L.sid === tour.nextId);
+        else if (L.kind === 'day' || L.kind === 'follow') show = false;
+        else if (L.kind === 'title') show = L.situ === situ;
+        if (L.kind === 'tag' && L.el.classList.contains('cur') !== (L.sid === tour.curId)) L.el.classList.toggle('cur', L.sid === tour.curId);
+      } else if (L.kind === 'tag' && L.el.classList.contains('cur')) L.el.classList.remove('cur');
       if (L.person && !L.person.g.visible) show = false;
       if (show) {
         if (L.person) v.copy(L.person.g.position).setY(2.35); else v.copy(L.kind === 'follow' ? marker.position : L.pos);
@@ -2888,6 +2968,7 @@
       if (u >= 1) {
         var sv = fly.saved; cam.target.copy(sv.target); cam.r = sv.r; cam.theta = sv.theta; cam.phi = sv.phi; followCam = sv.followCam;
         fly = null; showSchema(0);
+        if (pendingTour) { pendingTour = false; startTour(); }
       }
     }
   }
@@ -2901,6 +2982,316 @@
     schemaR.hits.forEach(function (h) { var d = (h.x - x) * (h.x - x) + (h.y - y) * (h.y - y); if (d < bd) { bd = d; best = h; } });
     if (best) { followed = best.o; followNext = false; restyleFollowed(); refreshUi(); }
   });
+
+  /* ---------- vlucht: met de geselecteerde order door de fabriek ---------- */
+  var tour = null, pendingTour = false;
+  var TOUR_DEPT = {
+    voor: { intake: 'Kantoor (sales)', calc: 'Kantoor (sales)', wvb: 'Werkvoorbereiding', plan: 'Werkvoorbereiding', po: 'Werkvoorbereiding', kast: 'Werkvoorbereiding',
+      rack: 'Productie', zagen: 'Productie', buffer: 'Productie', buigen: 'Productie', controle: 'Productie', cnc: 'Productie', voorbew: 'Productie',
+      hogewip: 'Lasserij', lassen: 'Lasserij', coaten: 'Coat afd.', montage: 'Montage', expeditie: 'Expeditie', klant: 'Klant' },
+    na: { intake: 'Persoon 1', materiaal: 'Leverancier', buigen: 'Persoon 2', cnc: 'Persoon 2', voorbew: 'Persoon 2', lassen: 'Persoon 3', coaten: 'Persoon 3',
+      droog: 'Persoon 3', montage: 'Persoon 1', expeditie: 'Persoon 1', klant: 'Klant' }
+  };
+  var TOUR_COLOR = { 'Kantoor (sales)': '#5B9BD5', 'Werkvoorbereiding': '#5B9BD5', 'Productie': '#4F8B2F', 'Lasserij': '#4F8B2F', 'Coat afd.': '#4F8B2F',
+    'Montage': '#4F8B2F', 'Expeditie': '#4F8B2F', 'Klant': '#1A1A1A', 'Persoon 1': '#4D7CF0', 'Persoon 2': '#F2B800', 'Persoon 3': '#8E98A4', 'Leverancier': '#E8191B' };
+  var TOUR_AZ0 = 0.15, tV1 = new T.Vector3(), tV2 = new T.Vector3(), tV3 = new T.Vector3();
+
+  function tourAnchor(id) {
+    if (id === 'rack') return new T.Vector3(-29.5, 1.0, 2.3);
+    if (id === 'klant') return W.truck.home.clone().add(new T.Vector3(2.4, 1.45, 0));
+    var st = ST[id];
+    if (st.work) return st.work.clone();
+    if (st.kast) return new T.Vector3(st.kast.x, 1.2, st.kast.z + 1.0);
+    if (st.wait) { var w = st.wait; return new T.Vector3(w.x0 + (w.cols - 1) * w.sx / 2, 0.55, w.z0 + (w.rows - 1) * w.sz / 2); }
+    return new T.Vector3(st.tag.x, 0.6, st.tag.z);
+  }
+  function tourStage(id) {
+    if (id === 'rack') return 'raw';
+    if (id === 'klant') return 'pallet';
+    return (situ === 'na' ? STAGE_NA : STAGE_OF)[id];
+  }
+  var TOUR_TRY = [0, 0.7, -0.7, 1.4, -1.4, 2.2, -2.2, Math.PI], tourRay = new T.Raycaster(), tourOcc = null;
+  function tourBlocked(from, to) {
+    if (!tourOcc) {
+      tourOcc = [];
+      Object.keys(W.stations).forEach(function (id) { var g = W.stations[id].group; if (g && tourOcc.indexOf(g) < 0) tourOcc.push(g); });
+      W.onlyVoor.forEach(function (g) { if (tourOcc.indexOf(g) < 0) tourOcc.push(g); });
+    }
+    var src = tV2.copy(from); src.y += 0.6;
+    var dir = new T.Vector3().subVectors(to, src), L = dir.length(); dir.multiplyScalar(1 / L);
+    tourRay.set(src, dir); tourRay.far = L;
+    var hits = tourRay.intersectObjects(tourOcc.filter(function (g) { return g.visible; }), true);
+    for (var i = 0; i < hits.length; i++) { var ob = hits[i].object; if (ob.isMesh && ob.visible && !(ob.material && ob.material.transparent && ob.material.opacity < 0.5) && hits[i].distance > 1.4) return true; }
+    return false;
+  }
+  function smoother(u) { return u * u * u * (u * (u * 6 - 15) + 10); }
+  function lerpAngle(a, b, k) { return a + Math.atan2(Math.sin(b - a), Math.cos(b - a)) * k; }
+
+  // de route als boog door de lucht: laag bij elk station, hoger daartussen
+  function tourCurve(stops, startPos) {
+    var ctrl = [], prev = null;
+    if (startPos) { ctrl.push(startPos.clone()); prev = startPos; }
+    stops.forEach(function (sp) {
+      var a = tourAnchor(sp.id);
+      if (prev && prev.distanceTo(a) < 0.6) { sp.ci = ctrl.length - 1; return; }
+      if (prev) {
+        var L = Math.hypot(a.x - prev.x, a.z - prev.z), m = prev.clone().lerp(a, 0.5);
+        m.y = Math.max(prev.y, a.y) + Math.min(4.2, Math.max(1.8, 1.3 + L * 0.07));
+        ctrl.push(m);
+      }
+      sp.ci = ctrl.length; ctrl.push(a); prev = a;
+    });
+    if (ctrl.length < 2) ctrl.push(ctrl[0].clone().add(new T.Vector3(0.01, 0, 0)));
+    var curve = new T.CatmullRomCurve3(ctrl, false, 'centripetal', 0.5), N = ctrl.length - 1, PER = 24, tab = [0], p0 = curve.getPoint(0), acc = 0;
+    for (var i = 1; i <= N * PER; i++) { var p = curve.getPoint(i / (N * PER)); acc += p.distanceTo(p0); tab.push(acc); p0 = p; }
+    stops.forEach(function (sp) { sp.s = tab[sp.ci * PER]; });
+    return { curve: curve, tab: tab, n: N * PER, len: acc };
+  }
+  function tourPoint(cv, s, out) {
+    var tab = cv.tab, lo = 0, hi = cv.n;
+    s = Math.max(0, Math.min(cv.len, s));
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (tab[mid] < s) lo = mid; else hi = mid; }
+    var seg = tab[hi] - tab[lo], f = seg > 1e-6 ? (s - tab[lo]) / seg : 0;
+    return cv.curve.getPoint((lo + f) / cv.n, out);
+  }
+
+  // gestippelde gouden route op de vloer
+  function tourRibbon(cv, s0) {
+    var pos = [], step = 0.25, w = 0.16, a = new T.Vector3(), b = new T.Vector3();
+    for (var s = s0; s < cv.len - step; s += step) {
+      if ((s - s0) % 1.1 > 0.65) continue;
+      tourPoint(cv, s, a); tourPoint(cv, s + step, b);
+      var dx = b.x - a.x, dz = b.z - a.z, l = Math.hypot(dx, dz);
+      if (l < 1e-4) continue;
+      var nx = -dz / l * w, nz = dx / l * w, y = 0.13;
+      pos.push(a.x + nx, y, a.z + nz, a.x - nx, y, a.z - nz, b.x + nx, y, b.z + nz,
+        a.x - nx, y, a.z - nz, b.x - nx, y, b.z - nz, b.x + nx, y, b.z + nz);
+    }
+    var geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+    return new T.Mesh(geo, new T.MeshBasicMaterial({ color: '#FFB000', transparent: true, opacity: 0.9, depthWrite: false, side: T.DoubleSide }));
+  }
+
+  function makeGhost(o) {
+    var g = new T.Group();
+    var holder = new T.Group(); holder.scale.setScalar(1.25); g.add(holder);
+    var glowM = new T.MeshBasicMaterial({ color: '#FFC000', transparent: true, opacity: 0.35, depthWrite: false, side: T.DoubleSide });
+    var disc = new T.Mesh(new T.CircleGeometry(0.95, 36), glowM); disc.rotation.x = -Math.PI / 2; disc.position.y = 0.02; g.add(disc);
+    var ring = new T.Mesh(new T.RingGeometry(0.85, 1.1, 44), new T.MeshBasicMaterial({ color: '#FFC000', transparent: true, opacity: 0.95, depthWrite: false, side: T.DoubleSide }));
+    ring.rotation.x = -Math.PI / 2; scene.add(ring);
+    var beam = new T.Mesh(new T.CylinderGeometry(0.035, 0.035, 1, 6), new T.MeshBasicMaterial({ color: '#FFC000', transparent: true, opacity: 0.55, depthWrite: false }));
+    scene.add(beam);
+    scene.add(g);
+    return { g: g, holder: holder, ring: ring, beam: beam, item: { order: o, coat: COAT[o.id % COAT.length], paint: null }, stage: null, pop: 1 };
+  }
+  function ghostStage(gh, stage) {
+    if (!stage || gh.stage === stage) return;
+    if (gh.stageG) gh.holder.remove(gh.stageG);
+    gh.stage = stage; gh.stageG = buildStage(stage, gh.item); gh.holder.add(gh.stageG);
+    gh.pop = 0;
+  }
+
+  function tourBanner(main, sub) {
+    var b = $('tourBanner');
+    $('tbMain').textContent = main; $('tbSub').textContent = sub || ''; $('tbSub').hidden = !sub;
+    b.hidden = false; b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
+    if (tour) tour.bannerT = reduce ? 3.2 : 2.8;
+  }
+
+  function buildTourHud() {
+    var ol = $('tourRoute'); ol.textContent = '';
+    tour.groups.forEach(function (gr, gi) {
+      var li = document.createElement('li'), dot = document.createElement('i');
+      dot.style.background = TOUR_COLOR[gr.dept] || '#5A616B';
+      li.appendChild(dot); li.appendChild(document.createTextNode(gr.dept));
+      gr.el = li; ol.appendChild(li);
+    });
+    $('tourOrder').textContent = mode === 'single' ? 'jouw order' : 'order #' + tour.o.id;
+  }
+  function tourHud() {
+    var t = tour, sp = t.stops[t.j], gi = sp.g;
+    t.groups.forEach(function (gr, i) {
+      var st = i === gi ? 'cur' : i < t.stops[t.start].g ? 'skip' : i < gi ? 'done' : 'next';
+      if (gr.state !== st) { gr.el.setAttribute('data-state', st); gr.state = st; if (st === 'cur' && gr.el.scrollIntoView) gr.el.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+    });
+    var n = t.stops.length - t.start, k = t.j - t.start + 1;
+    $('tourProg').textContent = 'stop ' + k + ' van ' + n;
+    $('tourStation').textContent = sp.name;
+    $('tourDept').textContent = TOUR_DEPT[situ][sp.id] + (situ === 'na' && sp.id !== 'klant' && sp.id !== 'materiaal' ? ' · QROC-cel' : '');
+    var f = [];
+    if (sp.id === 'rack') f.push('materiaal uit de staalvoorraad (grote inkoop)');
+    else if (sp.id === 'klant') f.push('geleverd na ' + days(BP.tDone) + ' werkdagen volgens de live job map');
+    else {
+      var s = sp.step;
+      if (s.touch > 0) { f.push(s.wait > 0 ? 'eerst ' + dur(s.wait) + ' wachten' : 'geen wachttijd'); f.push('bewerken ' + dur(s.touch)); }
+      else f.push(dur(s.wait) + ' wachten, geen bewerking');
+    }
+    f.push(PRODUCT_WORD[tourStage(sp.id)] || '');
+    $('tourFacts').textContent = f.filter(Boolean).join(' · ');
+    var dayT = sp.id === 'klant' ? BP.tDone : BP.arr[Math.min(sp.idx, BP.arr.length - 1)] || 0;
+    $('tourDay').textContent = 'dag ' + Math.min(R.days, Math.floor(dayT / H) + 1) + ' van ' + R.days;
+    // het station zelf licht op met zijn label
+    t.curId = sp.id; t.nextId = t.stops[t.j + 1] ? t.stops[t.j + 1].id : null;
+  }
+
+  function startTour() {
+    if (tour || trans || fly) return;
+    if (viewMode === 'schema') { pendingTour = true; flyOut(); return; }
+    var o = followed;
+    if (!o && fac.orders.length) { o = fac.orders.reduce(function (a, b) { return b.id > a.id ? b : a; }); followed = o; followNext = false; restyleFollowed(); refreshUi(); }
+    if (!o) return;
+    // alle stops van de route, met de staalvoorraad vóór het zagen en de vrachtwagen als eindpunt
+    var stops = [];
+    STEPS.forEach(function (s, i) {
+      if (situ === 'voor' && s.id === 'zagen') stops.push({ id: 'rack', idx: i, name: 'Staalvoorraad' });
+      stops.push({ id: s.id, idx: i, name: s.name, step: s });
+    });
+    stops.push({ id: 'klant', idx: STEPS.length, name: 'Vrachtwagen naar de klant' });
+    var groups = [];
+    stops.forEach(function (sp) {
+      var d = TOUR_DEPT[situ][sp.id];
+      if (!groups.length || groups[groups.length - 1].dept !== d) groups.push({ dept: d });
+      sp.g = groups.length - 1;
+    });
+    var start = 0;
+    if (o.phase !== 'done') for (var i = 0; i < stops.length; i++) if (stops[i].idx === o.step && stops[i].id !== 'rack') { start = i; break; }
+    var it = items.get(o.id + 'm'), startPos = null;
+    if (o.phase !== 'done' && it && !it.gone && !it.onTruck && it.root.parent) { startPos = it.root.getWorldPosition(new T.Vector3()); startPos.y = Math.max(0.45, startPos.y + 0.1); }
+    var rest = stops.slice(start), cv = tourCurve(rest, startPos);
+    var gh = makeGhost(o);
+    ghostStage(gh, it && it.stage && startPos ? it.stage : tourStage(rest[0].id));
+    var ribbon = tourRibbon(cv, 0); scene.add(ribbon);
+    var p0 = tourPoint(cv, 0, new T.Vector3()), pA = tourPoint(cv, Math.min(cv.len, 7), new T.Vector3());
+    var yaw = Math.hypot(pA.x - p0.x, pA.z - p0.z) > 0.3 ? Math.atan2(pA.x - p0.x, pA.z - p0.z) : cam.theta + Math.PI;
+    tour = { o: o, stops: stops, start: start, j: start, cv: cv, ghost: gh, ribbon: ribbon, s: 0, phase: 'intro', t: 0,
+      dur: reduce ? 0.01 : 1.9, yaw: yaw, yawGoal: yaw, look: cam.target.clone(), camFrom: camera.position.clone(), lookFrom: cam.target.clone(),
+      wasPlaying: playing, speed: 1, paused: false, bannerT: 0, groups: groups, curId: null, nextId: null };
+    playing = false; setPlayLabel();
+    camGoal = null; followCam = false;
+    if (it) { it.root.visible = false; tour.hidden = it; }
+    if ($('app').getAttribute('data-menu') === 'open') setMenu(false);
+    $('app').setAttribute('data-tour', 'on'); $('tour').hidden = false;
+    $('btnFlight').setAttribute('aria-pressed', 'true'); $('btnFlight').querySelector('span').textContent = 'Stop vlucht';
+    $('tourSpeed').setAttribute('aria-pressed', 'false'); $('tourPause').textContent = 'Pauze';
+    buildTourHud(); tourHud();
+    var sp0 = stops[start];
+    tourBanner('Vlucht met ' + (mode === 'single' ? 'jouw order' : 'order #' + o.id), (o.phase === 'done' ? 'Opnieuw vanaf het begin · ' : 'Nu bij ') + sp0.name + ' · ' + TOUR_DEPT[situ][sp0.id]);
+  }
+
+  function endTour(reason) {
+    if (!tour) return;
+    var t = tour; tour = null; pendingTour = false;
+    var gh = t.ghost;
+    [gh.g, gh.ring, gh.beam, t.ribbon].forEach(function (o) { scene.remove(o); o.traverse(function (m) { if (m.geometry) m.geometry.dispose(); }); });
+    if (t.hidden) t.hidden.root.visible = true;
+    $('app').removeAttribute('data-tour'); $('tour').hidden = true; $('tourBanner').hidden = true;
+    $('btnFlight').setAttribute('aria-pressed', 'false'); $('btnFlight').querySelector('span').textContent = 'Vlucht';
+    // de orbit-camera neemt het beeld exact over: richtpunt = waar de kijkrichting de vloer raakt
+    var cp = camera.position, d = t.look.clone().sub(cp), k = d.y < -0.05 ? -cp.y / d.y : 20;
+    var tg = cp.clone().addScaledVector(d, Math.min(k, 60)); tg.y = 0;
+    var off = cp.clone().sub(tg);
+    cam.target.copy(tg); cam.r = Math.min(240, Math.max(10, off.length()));
+    cam.phi = Math.max(0.18, Math.min(1.38, Math.acos(Math.max(-1, Math.min(1, off.y / cam.r)))));
+    cam.theta = Math.atan2(off.x, off.z);
+    playing = t.wasPlaying; setPlayLabel();
+    if (reason !== 'user' && reason !== 'silent') setPreset('follow');
+  }
+
+  function tourMove(toJ) {
+    var t = tour, a = t.stops[t.j], b = t.stops[toJ], da = TOUR_DEPT[situ][a.id], db = TOUR_DEPT[situ][b.id];
+    var L = b.s - t.s;
+    if (da !== db) tourBanner(da + '  →  ' + db, R.handoff[b.id] ? (situ === 'na' ? 'Overdracht binnen de cel' : 'Overdracht naar een andere afdeling') : (b.id === 'klant' ? 'De order verlaat de fabriek' : 'Andere afdeling'));
+    ghostStage(t.ghost, tourStage(b.id));
+    t.phase = 'move'; t.t = 0; t.sFrom = t.s; t.sTo = b.s; t.toJ = toJ;
+    t.dur = reduce ? 0.01 : Math.min(6.5, Math.max(1.2, 0.9 + L / 9));
+  }
+  function tourArrive(j) {
+    var t = tour; t.j = j; t.s = t.stops[j].s;
+    tourHud();
+    var sp = t.stops[j], long = sp.step && sp.step.wait >= H;
+    t.phase = 'dwell'; t.t = 0; t.dur = reduce ? 2.6 : (j === t.stops.length - 1 ? 2.6 : long ? 2.0 : 1.35);
+    if (sp.id === 'klant') tourBanner('Geleverd aan de klant', 'MCT volgens de live job map: ' + R.days + ' werkdagen');
+  }
+
+  var tDesired = new T.Vector3(), tLook = new T.Vector3();
+  function tickTour(dt) {
+    var t = tour, gh = t.ghost, sdt = t.paused ? 0 : dt * t.speed;
+    if (t.bannerT > 0) { t.bannerT -= dt; if (t.bannerT <= 0) $('tourBanner').hidden = true; }
+    t.t += sdt;
+    if (t.phase === 'move') {
+      var u = Math.min(1, t.t / t.dur);
+      t.s = t.sFrom + (t.sTo - t.sFrom) * smoother(u);
+      if (u >= 1) tourArrive(t.toJ);
+    } else if (t.phase === 'dwell' && t.t >= t.dur) {
+      if (t.j >= t.stops.length - 1) { endTour('done'); return; }
+      tourMove(t.j + 1);
+    } else if (t.phase === 'intro' && t.t >= t.dur) {
+      var first = t.stops[t.start];
+      if (first.s > 0.05) { t.phase = 'move'; t.t = 0; t.sFrom = 0; t.sTo = first.s; t.toJ = t.start; t.dur = reduce ? 0.01 : Math.min(3, Math.max(1, 0.8 + first.s / 9)); }
+      else tourArrive(t.start);
+    }
+    // product boven de route
+    var gp = tourPoint(t.cv, t.s, tV1);
+    gh.g.position.copy(gp);
+    var ahead = tourPoint(t.cv, Math.min(t.cv.len, t.s + 7), tV2), dx = ahead.x - gp.x, dz = ahead.z - gp.z;
+    if (dx * dx + dz * dz > 0.25) t.yawGoal = Math.atan2(dx, dz);
+    t.yaw = lerpAngle(t.yaw, t.yawGoal, reduce ? 1 : 1 - Math.exp(-dt * 1.8));
+    var want = t.yaw - Math.PI / 2;
+    gh.g.rotation.y = lerpAngle(gh.g.rotation.y, want, 1 - Math.exp(-dt * 6));
+    gh.pop = Math.min(1, gh.pop + dt / 0.35);
+    var pk = gh.pop < 1 ? 1 + Math.sin(gh.pop * Math.PI) * 0.35 : 1;
+    gh.holder.scale.setScalar(1.25 * pk);
+    var pulse = 1 + Math.sin(clock * 4) * 0.08;
+    gh.ring.position.set(gp.x, 0.12, gp.z); gh.ring.scale.set(pulse, pulse, pulse);
+    var bh = Math.max(0.05, gp.y - 0.12); gh.beam.scale.set(1, bh, 1); gh.beam.position.set(gp.x, 0.12 + bh / 2, gp.z); gh.beam.visible = gp.y > 0.9;
+    // camera: schuin achter het product, maar altijd vanaf de 'raamkant' (zuid), zodat je de stations van voren ziet
+    var behind = t.yaw + Math.PI, rel = Math.atan2(Math.sin(behind - TOUR_AZ0), Math.cos(behind - TOUR_AZ0));
+    var azGoal = TOUR_AZ0 + Math.max(-1.05, Math.min(1.05, rel * 0.85));
+    // staat er een machine of cabine tussen camera en product? dan draait de camera om naar een vrije kant
+    t.occT = (t.occT || 0) - dt;
+    if (t.occT <= 0) {
+      t.occT = 0.25;
+      var D0 = 11 * aspectFactor(), H0 = 8 + 0.5 * (gp.y - 1), best = null;
+      for (var ci = 0; ci < TOUR_TRY.length; ci++) {
+        var az = azGoal + TOUR_TRY[ci];
+        tV3.set(gp.x + Math.sin(az) * D0, gp.y + H0, gp.z + Math.cos(az) * D0);
+        if (!tourBlocked(gp, tV3)) { best = TOUR_TRY[ci]; break; }
+      }
+      if (t.azOff == null || best === null || tourBlocked(gp, tV3.set(gp.x + Math.sin(azGoal + t.azOff) * D0, gp.y + H0, gp.z + Math.cos(azGoal + t.azOff) * D0))) t.azOff = best === null ? 0 : best;
+      t.liftGoal = best === null ? 1 : 0;
+    }
+    azGoal += t.azOff || 0;
+    t.lift = (t.lift || 0) + ((t.liftGoal || 0) - (t.lift || 0)) * (1 - Math.exp(-dt * 2));
+    t.az = t.az == null ? azGoal : lerpAngle(t.az, azGoal, reduce ? 1 : 1 - Math.exp(-dt * 1.4));
+    var D = 11 * aspectFactor() * (1 - 0.4 * t.lift), hh = 8 + 0.5 * (gp.y - 1) + 7 * t.lift;
+    tDesired.set(gp.x + Math.sin(t.az) * D, gp.y + hh, gp.z + Math.cos(t.az) * D);
+    // kijkpunt iets vóór het product (richting camera en rijrichting): het product staat dan boven het infopaneel in beeld
+    tLook.set(gp.x + Math.sin(t.az) * 2.2 + Math.sin(t.yaw) * 1.2, gp.y - 0.4, gp.z + Math.cos(t.az) * 2.2 + Math.cos(t.yaw) * 1.2);
+    if (t.phase === 'intro') {
+      var e = easeIO(Math.min(1, t.t / t.dur)), kk = 1 - e, a = t.camFrom, c = tDesired, b = tV3.copy(a).lerp(c, 0.5);
+      b.y = Math.max(a.y, c.y) + 4;
+      camera.position.set(kk * kk * a.x + 2 * kk * e * b.x + e * e * c.x, kk * kk * a.y + 2 * kk * e * b.y + e * e * c.y, kk * kk * a.z + 2 * kk * e * b.z + e * e * c.z);
+      t.look.copy(t.lookFrom).lerp(tLook, e);
+    } else {
+      camera.position.lerp(tDesired, reduce ? 1 : 1 - Math.exp(-dt * 3));
+      t.look.lerp(tLook, reduce ? 1 : 1 - Math.exp(-dt * 5));
+    }
+    camera.lookAt(t.look);
+    cam.target.set(t.look.x, 0, t.look.z);
+    // voortgangsbalk
+    var n = t.stops.length - 1 - t.start, f = 0;
+    if (n > 0) {
+      var base = t.j - t.start;
+      if (t.phase === 'move') base = (t.toJ - t.start) - 1 + Math.min(1, t.t / t.dur);
+      f = Math.max(0, Math.min(1, base / n));
+    }
+    $('tourBarFill').style.transform = 'scaleX(' + f.toFixed(3) + ')';
+  }
+
+  $('btnFlight').addEventListener('click', function () { if (tour) endTour('ui'); else startTour(); });
+  $('tourStop').addEventListener('click', function () { endTour('ui'); });
+  $('tourPause').addEventListener('click', function () { if (!tour) return; tour.paused = !tour.paused; this.textContent = tour.paused ? 'Verder' : 'Pauze'; });
+  $('tourSpeed').addEventListener('click', function () { if (!tour) return; tour.speed = tour.speed === 1 ? 2 : 1; this.setAttribute('aria-pressed', String(tour.speed === 2)); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && tour) endTour('ui'); });
 
   /* ---------- mobiel en navigatieknoppen ---------- */
   var mqMobile = window.matchMedia('(max-width: 760px), (pointer: coarse) and (max-height: 520px)');
@@ -2942,8 +3333,8 @@
     if ($('scKpis')) $('scKpis').hidden = mode !== 'full';
     var touch = window.matchMedia('(pointer: coarse)').matches;
     $('hint').textContent = (mode === 'full' ? (touch ? 'Tik op een product om het te volgen. ' : 'Klik op een product om het te volgen. ') : '') + (touch
-      ? 'Eén vinger = draaien, twee vingers = schuiven en zoomen. Dubbeltik op het leanboard om in te zoomen.'
-      : 'Slepen = draaien, rechts slepen of Shift = schuiven, scrollen = zoomen. Klik op het leanboard om in te zoomen.');
+      ? 'Eén vinger = draaien, twee vingers = schuiven en zoomen. Dubbeltik op het leanboard om in te zoomen. Vlucht = meevliegen met de order.'
+      : 'Slepen = draaien, rechts slepen of Shift = schuiven, scrollen = zoomen. Klik op het leanboard om in te zoomen. Vlucht = meevliegen met de order.');
   }
   $('mSingle').addEventListener('click', function () { if (mode !== 'single') { mode = 'single'; build(); playing = !reduce; setPlayLabel(); setPreset('follow'); } });
   $('mFull').addEventListener('click', function () { if (mode !== 'full') { mode = 'full'; build(); playing = !reduce; setPlayLabel(); setPreset('overview'); } });
@@ -2961,6 +3352,7 @@
   // schakelaar vóór / na QRM (de na-situatie volgt nog)
   $('qrmSwitch').addEventListener('click', function () {
     if (trans) return;
+    if (tour) endTour('silent');
     var on = this.getAttribute('aria-checked') !== 'true';
     this.setAttribute('aria-checked', String(on));
     $('lbVoor').classList.toggle('on', !on); $('lbNa').classList.toggle('on', on);
@@ -3024,7 +3416,7 @@
       if (camGoal.theta != null) cam.theta += (camGoal.theta - cam.theta) * k;
       if (camGoal.phi != null) cam.phi += (camGoal.phi - cam.phi) * k;
     }
-    if (fly) tickFly(dt); else if (viewMode === '3d') applyCam();
+    if (fly) tickFly(dt); else if (tour) tickTour(dt); else if (viewMode === '3d') applyCam();
     // nevel schaalt mee met de camera-afstand, zodat de fabriek ook van ver scherp blijft
     var cd = camera.position.distanceTo(cam.target); scene.fog.near = cd + 40; scene.fog.far = cd + 170;
     if (viewMode === '3d' || fly) {
@@ -3050,7 +3442,7 @@
   cam.target.set(-26, 0, -12); cam.r = 60;
   playing = !reduce; setPlayLabel();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawMct);
-  window.__sim = { freeCam: function () { camGoal = null; followCam = false; }, get view() { return viewMode; }, get fly() { return fly; }, flyIn: flyIn, flyOut: flyOut, get situ() { return situ; }, get trans() { return trans; }, startTransition: startTransition, get fac() { return fac; }, get followed() { return followed; }, items: items, setPreset: setPreset, cam: cam, camera: camera, tick: function (dt, n) { manual = true; for (var i = 0; i < n; i++) logic(dt); }, setSpeed: function (h) { hoursPerSec = h; }, truck: function () { return truckState; } };
+  window.__sim = { startTour: startTour, endTour: endTour, get tour() { return tour; }, freeCam: function () { camGoal = null; followCam = false; }, get view() { return viewMode; }, get fly() { return fly; }, flyIn: flyIn, flyOut: flyOut, get situ() { return situ; }, get trans() { return trans; }, startTransition: startTransition, get fac() { return fac; }, get followed() { return followed; }, items: items, setPreset: setPreset, cam: cam, camera: camera, tick: function (dt, n) { manual = true; for (var i = 0; i < n; i++) logic(dt); }, setSpeed: function (h) { hoursPerSec = h; }, truck: function () { return truckState; } };
   requestAnimationFrame(frame);
 })();
 </script>
