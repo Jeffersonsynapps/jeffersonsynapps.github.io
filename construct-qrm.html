@@ -171,6 +171,9 @@
   .sc-kpis dt { font-size: 12px; color: #3A3A3A; }
   .sc-kpis dd { margin: 0; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
+
+  .phead { flex-wrap: wrap; } #btnPanel { white-space: nowrap; }
+
   /* vlucht */
   #btnFlight { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px 0 8px; margin-left: 8px; border-radius: 13px; border: 1.5px solid #7F6000; background: var(--note); color: #262626; font-size: 13px; font-weight: 700; }
   #btnFlight:hover { background: var(--gold); }
@@ -1855,13 +1858,15 @@
       g.strokeStyle = C.ink; g.lineWidth = 1.2;
       g.beginPath(); g.moveTo(X(0), ya); g.lineTo(X(Dmax), ya); g.stroke();
       g.fillStyle = C.ink; g.font = '20px ' + F_BODY; g.textAlign = 'center';
+      // tijdas: aftellen naar de levering (QRM-gebruik) of optellen vanaf de order
+      var af = (api.mctAxis ? api.mctAxis() : 'op') === 'af';
       for (var d = 0; d <= Dmax; d++) {
-        var big = d % cfg.every === 0;
+        var v = af ? cfg.days - d : d, big = v % cfg.every === 0;
         g.beginPath(); g.moveTo(X(d), ya); g.lineTo(X(d), ya + (big ? 28 : 12)); g.stroke();
-        if (big) g.fillText(String(d), X(d), ya + 50);
+        if (big) { g.font = (v === 0 ? '700 ' : '') + '20px ' + F_BODY; g.fillText(v < 0 ? '\u2212' + (-v) : String(v), X(d), ya + 50); }
       }
       g.font = '14px ' + F_BODY; g.fillStyle = C.muted; g.textAlign = 'left';
-      g.fillText('werkdagen sinds order intake', X(0), ya - 8);
+      g.fillText(af ? 'werkdagen tot levering (0 = levering na de MCT van ' + cfg.days + ' dagen)' : 'werkdagen sinds order intake', X(0), ya - 8);
       var last = cfg.rows[cfg.rows.length - 1];
       g.strokeStyle = C.dash; g.setLineDash([3, 4]); g.lineWidth = 1;
       g.beginPath(); g.moveTo(X(cfg.days), last.y + bh + 2); g.lineTo(X(cfg.days), ya); g.stroke(); g.setLineDash([]);
@@ -2740,13 +2745,14 @@
     g.strokeStyle = '#1A1A1A'; g.lineWidth = 1.5;
     g.beginPath(); g.moveTo(X(0), ya); g.lineTo(X(Dmax), ya); g.stroke();
     g.fillStyle = '#1A1A1A'; g.font = '19px ' + F; g.textAlign = 'center';
+    var af = mctAxis === 'af';
     for (var d = 0; d <= Dmax; d++) {
-      var big = d % (Dmax <= 10 ? 1 : 5) === 0;
+      var v = af ? CF.days - d : d, big = v % (Dmax <= 10 ? 1 : 5) === 0;
       g.beginPath(); g.moveTo(X(d), ya); g.lineTo(X(d), ya + (big ? 14 : 6)); g.stroke();
-      if (big) g.fillText(String(d), Math.max(X(d), x0 + 6), ya + 34);
+      if (big) { g.font = (v === 0 ? '700 ' : '') + '19px ' + F; g.fillText(v < 0 ? '\u2212' + (-v) : String(v), Math.max(X(d), x0 + 6), ya + 34); }
     }
     g.textAlign = 'right'; g.fillStyle = '#595959'; g.font = '17px ' + F;
-    g.fillText('werkdagen sinds order intake', x1, ya - 8);
+    g.fillText(af ? 'werkdagen tot levering (0 = MCT van ' + CF.days + ' dagen)' : 'werkdagen sinds order intake', x1, ya - 8);
   }
   function row(g, o, a, b, y, bounds, X, bh) {
     if (b <= a) return;
@@ -2866,11 +2872,15 @@
     });
   }
 
+  /* ---------- tijdas van de MCT: telt af naar de levering, zoals gebruikelijk in QRM ---------- */
+  var mctAxis = 'af';
+
   /* ---------- schema (2D) en leanboard ---------- */
   var schemaApi = {
     fac: function () { return fac; }, followed: function () { return followed; }, mode: function () { return mode; },
     situ: function () { return situ; }, R: function () { return R; }, BP: function () { return BP; },
-    deliveredAtView: function () { return deliveredAtView; }, days: days, H: H, reduce: reduce
+    deliveredAtView: function () { return deliveredAtView; }, days: days, H: H, reduce: reduce,
+    mctAxis: function () { return mctAxis; }
   };
   var schemaR = Schema.create(schemaApi), boardR = Schema.create(schemaApi, { snap: true });
   var viewMode = '3d', fly = null, savedCam = null;
@@ -3127,8 +3137,10 @@
     }
     f.push(PRODUCT_WORD[tourStage(sp.id)] || '');
     $('tourFacts').textContent = f.filter(Boolean).join(' · ');
-    var dayT = sp.id === 'klant' ? BP.tDone : BP.arr[Math.min(sp.idx, BP.arr.length - 1)] || 0;
-    $('tourDay').textContent = 'dag ' + Math.min(R.days, Math.floor(dayT / H) + 1) + ' van ' + R.days;
+    // aftellen naar de levering, net als de tijdas van de MCT
+    var dayT = sp.id === 'klant' ? BP.tDone : BP.arr[Math.min(sp.idx, BP.arr.length - 1)] || 0, rest = Math.max(0, (BP.tDone - dayT) / H);
+    var restTxt = Math.abs(rest - Math.round(rest)) < 0.05 ? nf0.format(Math.round(rest)) : nf1.format(rest);
+    $('tourDay').textContent = sp.id === 'klant' ? 'geleverd' : 'nog ' + restTxt + (restTxt === '1' ? ' dag' : ' dagen') + ' tot levering';
     // het station zelf licht op met zijn label
     t.curId = sp.id; t.nextId = t.stops[t.j + 1] ? t.stops[t.j + 1].id : null;
   }
